@@ -6,32 +6,34 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 import time
-
+PATH = "/usr/local/bin/chromedriver"
 
 
 TheSite = input("What website would you like?\ncostco\ntarget\nwalmart\n\n>> ")
+driver = webdriver.Chrome(PATH)
 
 
 if TheSite == str("target"):
-    PATH = "C:\Program Files (x86)\chromedriver.exe"
-    driver = webdriver.Chrome(PATH)
     driver.get("https://www.target.com/")
     TargetItem = input("\nWhat item would you like to search for? >> ")
+    #Finding search bar and sending the user input to it
     targetsearch = driver.find_element_by_id("search")
     targetsearch.send_keys(TargetItem)
     targetsearch.send_keys(Keys.RETURN)
 
+
+    time.sleep(5)
     anelement = WebDriverWait(driver,10).until(
         EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div/div[3]/div[2]/nav/div[1]/form/button[2]"))
     )
     anelement.click()
 
-    target = WebDriverWait(driver,10).until(
-        EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div/div[3]/div[2]/nav/div[1]/form/button[2]"))
-    )
-    target.click()
-
-
+    with open('TargetList.txt', 'w') as file:
+        file.truncate(0)
+        file.write(TargetItem)
+        
+    with open("TargetList.txt", "r") as file:
+        Display1 = file.readlines()
 
     asktarget = input("Would you like to search for another item? (y/n) >> ")
     if asktarget == str("y"):
@@ -39,15 +41,30 @@ if TheSite == str("target"):
             EC.presence_of_element_located((By.XPATH, "/html/body/div[11]/div/div/div/div/div/div/div[2]/div[1]/button"))
         )
         continueshopping.click()
+        time.sleep(5)
+
+        with open('TargetList.txt', 'w') as file:
+            file.write("\n")
+            file.write(asktarget)
+
+        with open("TargetList.txt", "r") as file:
+            Display2 = file.readlines()
+        print("You got " + str(Display2))
+
 
     else:
-        print("Done")
+        print("You got " + str(Display1))
+
+
+
+
+
+
 
 
 
 if TheSite == str("walmart"):
-    PATH = "C:\Program Files (x86)\chromedriver.exe"
-    driver = webdriver.Chrome(PATH)
+    driver = webdriver.Chrome()
     driver.get("https://www.walmart.com/")
     WalmartItem = input("\nWhat item would you like to search for? >> ")
     print("Loading...")
@@ -85,8 +102,6 @@ if TheSite == str("walmart"):
 
 
 if TheSite == str("costco"):
-    PATH = "C:\Program Files (x86)\chromedriver.exe"
-    driver = webdriver.Chrome(PATH)
     driver.get("https://www.costco.com/")
     CostcoItem = input("\nWhat item would you like to search for?\n >> ")
     costcosearch = driver.find_element_by_id("search-field")
